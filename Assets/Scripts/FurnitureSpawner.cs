@@ -61,4 +61,25 @@ public class FurnitureSpawner : MonoBehaviour
             }
         };
     }
+    
+    // another example of how you could change dye color
+    public void ChangeDyeColor(GameObject obj, Color newColor)
+    {
+        // Get the instanceID from the GameObject
+        InstanceGUID instanceIDComponent = obj.GetComponent<InstanceGUID>();
+        if (instanceIDComponent == null) return;
+
+        // Find the corresponding RuntimeFurnitureData
+        RuntimeFurniture runtimeData = jsonManager.RuntimeFurnitureList
+            .Find(data => data.instanceGUID == instanceIDComponent.GUID);
+        if (runtimeData == null) return;
+
+        // Apply the new dye color
+        Renderer renderer = obj.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = newColor;
+            runtimeData.dyeColor = newColor;
+        }
+    }
 }
