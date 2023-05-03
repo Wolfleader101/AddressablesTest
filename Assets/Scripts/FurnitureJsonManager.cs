@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 
 
-[System.Serializable]
+[Serializable]
 public class ListSerializer<T>
 {
     public List<T> data;

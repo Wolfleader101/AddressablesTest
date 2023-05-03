@@ -13,7 +13,8 @@ public class FurnitureSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SpawnFurniture(furnitureItem);
+        SpawnFurniture(furnitureItem, "960b0408-aa22-4042-bad3-14c7d65ed075");
+        SpawnFurniture(furnitureItem, "0e565c9b-dbab-4e86-ab26-4ac4019eeb66");
     }
 
     private void OnApplicationQuit()
@@ -21,29 +22,37 @@ public class FurnitureSpawner : MonoBehaviour
         jsonManager.SaveData();
     }
 
-    public void SpawnFurniture(Furniture furnitureData)
+    public void SpawnFurniture(Furniture furnitureData, string instanceId)
     {
-        // Find the corresponding RuntimeFurniture
-        RuntimeFurniture runtimeData = jsonManager.RuntimeFurnitureList
-            .Find(data => data.prefabGUID == furnitureData.FurnitureAsset.AssetGUID);
-
-        if (runtimeData == null)
-        {
-            // If there's no corresponding RuntimeFurniture, create one with the default values
-            runtimeData = new RuntimeFurniture
-            {
-                prefabGUID = furnitureData.FurnitureAsset.AssetGUID,
-                dyeColor = furnitureData.DefaultColor
-            };
-            jsonManager.RuntimeFurnitureList.Add(runtimeData);
-        }
-
         furnitureData.FurnitureAsset.InstantiateAsync().Completed += handle =>
         {
             GameObject obj = handle.Result;
-            obj.transform.position = new Vector3(0, 0.5f, 5); // Set desired spawn position here
+            System.Random random = new System.Random();
+            
+            // Find the corresponding RuntimeFurniture
+            RuntimeFurniture runtimeData = jsonManager.RuntimeFurnitureList
+                .Find(data => data.instanceGUID == instanceId);
+            
+            if (runtimeData == null)
+            {
+                // If there's no corresponding RuntimeFurniture, create one with the default values
+                runtimeData = new RuntimeFurniture
+                {
+                    instanceGUID = instanceId,
+                    prefabGUID = furnitureData.FurnitureAsset.AssetGUID,
+                    dyeColor = furnitureData.DefaultColor,
+                    pos = obj.transform.position,
+                    rot = obj.transform.rotation,
+                    scale = obj.transform.localScale
+                };
+                jsonManager.RuntimeFurnitureList.Add(runtimeData);
+            }
+            
+            obj.transform.position = runtimeData.pos;
+            obj.transform.rotation = runtimeData.rot;
+            obj.transform.localScale = runtimeData.scale;
 
-            // Apply the dye color from the RuntimeFurniture
+            // Apply the dye color
             Renderer renderer = obj.GetComponent<Renderer>();
             if (renderer != null)
             {
