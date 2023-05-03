@@ -27,7 +27,6 @@ public class FurnitureSpawner : MonoBehaviour
         furnitureData.FurnitureAsset.InstantiateAsync().Completed += handle =>
         {
             GameObject obj = handle.Result;
-            System.Random random = new System.Random();
             
             // Find the corresponding RuntimeFurniture
             RuntimeFurniture runtimeData = jsonManager.RuntimeFurnitureList
@@ -51,6 +50,8 @@ public class FurnitureSpawner : MonoBehaviour
             obj.transform.position = runtimeData.pos;
             obj.transform.rotation = runtimeData.rot;
             obj.transform.localScale = runtimeData.scale;
+            
+            obj.AddComponent<InstanceGUID>().GUID = runtimeData.instanceGUID;
 
             // Apply the dye color
             Renderer renderer = obj.GetComponent<Renderer>();
